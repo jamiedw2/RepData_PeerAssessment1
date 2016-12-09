@@ -7,19 +7,52 @@ output:
 
 
 ## Loading and preprocessing the data
-
-
+```{r LoadData}
+library(dplyr)
+library(ggplot2)
+active_data <- read.csv("activity.csv")
+active_data$date <- as.Date(as.character(active_data$date))
+active_data$time <- substr(as.POSIXct(sprintf("%04.0f", active_data$interval), 
+                                      format='%H%M'), 12, 16)
+active_data$time <- as.POSIXct(active_data$time, format="%H:%M")
+```
 
 ## What is mean total number of steps taken per day?
-
-
+```{r}
+result <- summarise(group_by(active_data, date), sumsteps=sum(steps, na.rm=TRUE))
+result
+ggplot(result, aes(sumsteps)) + geom_histogram(binwidth = 2000, col="black", fill="red") +
+        theme_bw() +
+        labs(title="Histogram of total steps per day", x="Total steps")
+paste("The mean number of steps per day is: ", mean(result$sumsteps))
+paste("The median number of steps per day is: ", median(result$sumsteps))
+```
 
 ## What is the average daily activity pattern?
-
-
+```{r}
+result2 <- summarise(group_by(active_data, time), meansteps=mean(steps, na.rm=TRUE))
+ggplot(result2, aes(time, meansteps)) + geom_line(col="blue", lwd=1) + theme_bw() +
+        labs(title="Mean number of steps taken over the day", y="Number of steps", x="Time") +
+        scale_x_datetime("", date_labels = "%H:%M")
+paste("On average, the maximum number of steps was taken at",
+      strftime(result2$time[which.max(result2$meansteps)], format="%H:%M"))
+```
 
 ## Imputing missing values
-
-
+```{r}
+paste("There are", sum(is.na(active_data$steps)), "missing values in the data")
+print("We will replace these with the mean value of that 5 minute interval")
+active_data2 <- active_data
+for (i in 1:nrow(active_data2)){
+        if (is.na(active_data2$steps[i])){
+                active_data2$steps[i] <- result2$meansteps[grep(active_data2$time[i],
+                                                                result2$time)]
+        }
+}
+result3 <- summarise(group_by(active_data2, date), sumsteps=sum(steps, na.rm=TRUE))
+ggplot(result3, aes(sumsteps)) + geom_histogram(binwidth = 2000, col="black", fill="red") +
+        theme_bw() +
+        labs(title="Histogram of total steps per day", x="Total steps")
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
