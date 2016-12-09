@@ -24,8 +24,8 @@ result
 ggplot(result, aes(sumsteps)) + geom_histogram(binwidth = 2000, col="black", fill="red") +
         theme_bw() +
         labs(title="Histogram of total steps per day", x="Total steps")
-paste("The mean number of steps per day is: ", mean(result$sumsteps))
-paste("The median number of steps per day is: ", median(result$sumsteps))
+paste("The mean number of steps per day is:", mean(result$sumsteps),
+      "and the median number of steps per day is:", median(result$sumsteps))
 ```
 
 ## What is the average daily activity pattern?
@@ -45,14 +45,18 @@ print("We will replace these with the mean value of that 5 minute interval")
 active_data2 <- active_data
 for (i in 1:nrow(active_data2)){
         if (is.na(active_data2$steps[i])){
-                active_data2$steps[i] <- result2$meansteps[grep(active_data2$time[i],
-                                                                result2$time)]
+                active_data2$steps[i] <- result2$meansteps[grep(format(active_data2$time[i], 
+                                                                "%H%M"), format(result2$time,
+                                                                "%H%M"))]
         }
 }
 result3 <- summarise(group_by(active_data2, date), sumsteps=sum(steps, na.rm=TRUE))
 ggplot(result3, aes(sumsteps)) + geom_histogram(binwidth = 2000, col="black", fill="red") +
         theme_bw() +
         labs(title="Histogram of total steps per day", x="Total steps")
+paste("The mean number of steps per day is:", mean(result3$sumsteps),
+      "and the median number of steps per day is:", median(result3$sumsteps))
+print("Imputing the missing data increases the mean to be much closer to the median and reshapes the histogram.")
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
