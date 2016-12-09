@@ -79,7 +79,7 @@ paste("The mean number of steps per day is:", mean(result$sumsteps),
 ```r
 result2 <- summarise(group_by(active_data, time), meansteps=mean(steps, na.rm=TRUE))
 ggplot(result2, aes(time, meansteps)) + geom_line(col="blue", lwd=1) + theme_bw() +
-        labs(title="Mean number of steps taken over the day", y="Number of steps", x="Time") +
+        labs(title="Mean number of steps taken over the day", y="Number of steps") +
         scale_x_datetime("", date_labels = "%H:%M")
 ```
 
@@ -156,7 +156,7 @@ active_data2$day <- as.factor(active_data2$day)
 
 result4 <- summarise(group_by(active_data2, day, time), meansteps=mean(steps, na.rm=TRUE))
 ggplot(result4, aes(time, meansteps)) + geom_line(col="blue", lwd=1) + theme_bw() +
-        labs(title="Mean number of steps taken over the day", y="Number of steps", x="Time") +
+        labs(title="Mean number of steps taken over the day", y="Number of steps") +
         scale_x_datetime("", date_labels = "%H:%M") + facet_grid(day~.)
 ```
 
